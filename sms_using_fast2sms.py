@@ -15,4 +15,5 @@ headers = {
 
 response = requests.request("GET", url, headers=headers, params=querystring)
 
+print("This was successfull")
 print(response.text)
