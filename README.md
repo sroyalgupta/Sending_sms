@@ -1,5 +1,5 @@
 # Grimlock
-An highly scalable application that will ingest the logs from mobile and will push this into the snappyflow.
+An highly scalable application that will ingest the logs from mobile and will push these logs into the snappyflow.
 
 ## Previous Architecture
 ![Optional Text](grimlock_v2.jpg)
@@ -43,12 +43,60 @@ Code Format can be a ZIP file or a container image. | Code Format can be a  Cont
  - We have not chosen aws apprunner as Grimlock underlying infrastructure because this is helpful when we do not know the scale but on the contrary, we know our current scale and Grimlock can sustain a 10X scale as compared to what we have today.
 
 ## Benchmarking Results
-Current Scale | ~250 requests/sec
---- | --- |
+|   |   |
+|---|---|
+**Current Scale** | **~250 requests/sec**
 **Grimlock Capacity** | **~5000 request/sec**
 **Current Response Time** | **~60 ms**
 **Grimlock Response Time** | **~4 ms**
 **Total Response Time( Grimlock + Lambda )** | **~120 ms**
+
+#### 
+**Note**: _Total Response Time is higher because AWS Lambda does not support asynchronous calls._
+
+## API Contract:
+```http
+POST /api/v1/logs/{path_parameter}
+```
+### Request Headers
+Name | Type | M/O | Description
+--- | --- | ---| ---|
+AppKey | String | M | Static Authorization key/ JWT Token
+
+### Request Payload
+Name | Type | M/O | Description
+--- | --- | ---| ---|
+source | string | O | Name of the mobile OS
+log_type | string | O | Log type
+app_key | string | O | App Key
+app_version | string | O | App Version
+mobile_number | string | O | Mobile Number of User
+device_details | string | O | Details of the device
+user_id | string | O | Id of the user
+ip_address | string | O | IP Address
+desc | string | O | Description about the event
+data | string | O | Actual log data
+app_platform | string | O | Name of the app platform E.g, pnb-merchant-android
+timestamp | string | O | Timestamp in epoch ( in milliseconds )
+env | string | O | Environment type E.g, uat
+
+### Response
+
+#### If API is successful
+|    |     |
+--- | --- |
+| Status Code | 200 |
+| Response | {‘msg’: ‘Logs posted Successfully’} | 
+
+#### If Headers are missing
+|    |     |
+--- | --- |
+| Status Code | 403 |
+| Response | {"errors":{"error_description": "Please provide authorization token", "error_type": "token_expired"}} | 
+
+
+
+
 
 
 
